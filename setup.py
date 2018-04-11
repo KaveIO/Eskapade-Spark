@@ -14,11 +14,9 @@ LICENSE.
 """
 
 import logging
-import sys
 
 from setuptools import find_packages
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
 
 NAME = 'Eskapade-Spark'
 
@@ -32,12 +30,22 @@ FULL_VERSION = VERSION
 if DEV:
     FULL_VERSION += '.dev'
 
+TEST_REQUIREMENTS = ['pytest==3.5.0',
+                     'pytest-pylint==0.9.0',
+                     ]
+
 REQUIREMENTS = [
-    'eskapade==0.8.0.dev'
+    'eskapade==0.8.0.dev',
+    # 'pyspark==2.1.2',
 ]
+
+REQUIREMENTS += TEST_REQUIREMENTS
 
 CMD_CLASS = dict()
 COMMAND_OPTIONS = dict()
+
+EXCLUDE_PACKAGES = []
+EXTERNAL_MODULES = []
 
 logging.basicConfig()
 logger = logging.getLogger(__file__)
@@ -72,47 +80,10 @@ release = {is_release!s}
         version_file.close()
 
 
-EXCLUDE_PACKAGES = []
-EXTERNAL_MODULES = []
-
-# This is for auto-generating documentation.
-# One can generate documentation by executing:
-# python setup.py build_sphinx -i
-HAVE_SPHINX = True
-try:
-    from sphinx.setup_command import BuildDoc
-
-    cmd_string = 'build_sphinx'
-
-    CMD_CLASS[cmd_string] = BuildDoc
-    COMMAND_OPTIONS[cmd_string] = {
-        'project': ('setup.py', NAME),
-        'version': ('setup.py', VERSION),
-        'release': ('setup.py', FULL_VERSION)
-    }
-except ImportError:
-    logger.fatal('Missing Sphinx packages!')
-    HAVE_SPHINX = False
-
-
 def setup_package() -> None:
     """The main setup method.
 
     It is responsible for setting up and installing the package.
-
-    It also provides commands for generating docs and running tests.
-
-    To generate sphinx docs execute:
-
-    >>> python setup.py build_sphinx -i
-
-    in the project folder.
-
-    To run tests execute:
-
-    >>> python setup test -a "some pytest test arguments"
-
-    in the project folder.
 
     :return:
     :rtype: None
@@ -136,27 +107,13 @@ def setup_package() -> None:
               NAME.lower(): ['config/*', 'templates/*', 'data/*', 'tutorials/*.sh']
           },
           install_requires=REQUIREMENTS,
-          tests_require=['pytest==3.2.2'],
+          tests_require=TEST_REQUIREMENTS,
           ext_modules=EXTERNAL_MODULES,
           cmdclass=CMD_CLASS,
           command_options=COMMAND_OPTIONS,
-          # The following 'creates' executable scripts for *nix and Windows.
-          # As an added the bonus the Windows scripts will auto-magically
-          # get a .exe extension.
-          #
-          # eskapade: main/app application entry point.
-          # eskapade_trial: test entry point.
-          entry_points={
-              'console_scripts': [
-                  'eskapade_ignite = eskapade.entry_points:eskapade_ignite',
-                  'eskapade_run = eskapade.entry_points:eskapade_run',
-                  'eskapade_trial = eskapade.entry_points:eskapade_trial',
-                  'eskapade_generate_link = eskapade.entry_points:eskapade_generate_link',
-                  'eskapade_generate_macro = eskapade.entry_points:eskapade_generate_macro',
-                  'eskapade_generate_notebook = eskapade.entry_points:eskapade_generate_notebook',
-                  'eskapade_bootstrap = eskapade.entry_points:eskapade_bootstrap'
-              ]
-          }
+          dependency_links=[
+              'git+https://git.kpmg.nl/KPMG-NL-AABD/Assets/decision-engine/eskapade.git@split_esroofit#egg=eskapade-0.8.0.dev',
+          ]
           )
 
 

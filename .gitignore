@@ -129,4 +129,6 @@ out/
 # JIRA plugin
 atlassian-ide-plugin.xml
 
-
+flake.txt
+python/eskapadespark/version.py
+junit-py35.xml

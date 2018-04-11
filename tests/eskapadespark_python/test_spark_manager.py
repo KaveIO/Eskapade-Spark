@@ -224,7 +224,7 @@ class SparkManagerTest(unittest.TestCase):
 
         mock_sm.get_config.side_effect = get_config
         eskapade_config = SparkManager._create_spark_conf(mock_sm, eskapade_settings=eskapade_settings)
-        mock_resources.assert_called_once_with('spark.cfg') 
+        mock_resources.assert_called_once_with('spark.cfg')
         mock_sm.reset_config.assert_called_once_with()
         created_config.setAll.assert_called_once_with([('foo', 'bar')])
         self.assertIs(eskapade_config, created_config, 'incorrect config set')
