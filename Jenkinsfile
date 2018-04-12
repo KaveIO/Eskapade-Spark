@@ -22,10 +22,9 @@ def status_string(String msg, String result) {
 
 
 properties([
-        pipelineTriggers([
-                upstream(
+        pipelineTriggers([upstream(
                     threshold: 'SUCCESS',
-                    upstreamProjects: '../eskapade/master', '../eskapade/split_esroofit'
+                    upstreamProjects: '../eskapade/master, ../eskapade/split_esroofit'
                 )
             ]
         )
