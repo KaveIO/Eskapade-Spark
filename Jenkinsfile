@@ -16,10 +16,21 @@ def status_string(String msg, String result) {
         msg += result
         return msg
     } else {
-        return "\n" + result
+        return result
     }
 }
 
+
+properties([
+        pipelineTriggers([
+                upstream(
+                    threshold: 'SUCCESS',
+                    upstreamProjects: '../eskapade/master', '../eskapade/split_esroofit'
+                )
+            ]
+        )
+    ]
+)
 
 podTemplate(
     name: pod_name,
@@ -41,7 +52,7 @@ podTemplate(
 
         stage('Setup') {
             try {
-                echo "Creating and setting up Python virtual environment for ${env.JOB_NAME}:${env.BRANCH_NAME}."
+                echo "Creating and setting up Python virtual environment for ${env.JOB_NAME}."
 
                 // Build the shell script to setup and create the
                 // virtual environment. This will be executed by
@@ -64,16 +75,18 @@ podTemplate(
                 echo status_string(status_msg, 'SUCCESS')
                 currentBuild.result = 'SUCCESS'
             } catch (exc) {
-                echo "Failed to setup project environment ${env.JOB_NAME}:${env.BRANCH_NAME}!"
-                echo exc.toString()
-                currentBuild.result = 'FAILURE'
+                // Abort! It does not make sense to continue!
+                def error_msg = "Failed to create and setup project environment for ${env.JOB_NAME}!\n"
+                error_msg += exc.toString()
+                currentBuild.result = 'ABORT'
+                error error_msg
             }
         }
 
         status_msg = ''
         stage('Checkout') {
             try {
-                echo "Going to checkout ${env.JOB_NAME}:${env.BRANCH_NAME}"
+                echo "Going to checkout ${env.JOB_NAME}."
                 container(name: 'jnlp', shell: '/bin/bash') {
                     checkout scm
                 }
@@ -81,16 +94,18 @@ podTemplate(
                 echo status_string(status_msg, 'SUCCESS')
                 currentBuild.result = 'SUCCESS'
             } catch (exc) {
-                echo "Failed to checkout source for ${env.JOB_NAME}:${env.BRANCH_NAME}!"
-                echo exc.toString()
-                currentBuild.result = 'FAILURE'
+                // Abort! It does not make sense to continue!
+                def error_msg = "Failed to checkout ${env.JOB_NAME}!\n"
+                error_msg exc.toString()
+                currentBuild.result = 'ABORT'
+                error error_msg
             }
         }
 
         status_msg = ''
         stage('Unit Test') {
             try {
-                echo "Going to run unit tests for ${env.JOB_NAME}:${env.BRANCH_NAME}."
+                echo "Going to run unit tests for ${env.JOB_NAME}."
 
                 // Build shell script to run unit tests.
                 //
@@ -108,8 +123,11 @@ podTemplate(
                 echo status_string(status_msg, 'SUCCESS')
                 currentBuild.result = 'SUCCESS'
             } catch (exc) {
-                echo "Unit tests failed for ${env.JOB_NAME}:${env.BRANCH_NAME}!"
-                echo exc.toString()
+                // We do not abort here. We mark this stage as a failure and continue
+                // with the cleanup stage.
+                def error_msg = "Unit tests failed for ${env.JOB_NAME}!\n"
+                error_msg += exc.toString()
+                echo error_msg
                 currentBuild.result = 'FAILURE'
             }
         }
@@ -117,7 +135,7 @@ podTemplate(
         status_msg = ''
         stage('Cleanup') {
             try {
-                echo "Going to gather test results and reports for ${env.JOB_NAME}:${env.BRANCH_NAME}"
+                echo "Going to gather test results and reports for ${env.JOB_NAME}."
 
                 container(name: 'jnlp', shell: '/bin/bash') {
                     junit '**/junit-*.xml'
@@ -130,7 +148,7 @@ podTemplate(
 
                 currentBuild.result = 'SUCCESS'
             } catch (exc) {
-                echo "Failed to gather test resutls and reports for ${env.JOB_NAME}:${env.BRANCH_NAME}"
+                echo "Failed to gather test resutls and reports for ${env.JOB_NAME}!"
                 currentBuild.result = 'FAILURE'
             } finally {
                 // Cleanup workspace
