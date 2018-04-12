@@ -21,6 +21,7 @@ def status_string(String msg, String result) {
 }
 
 
+/*
 properties([
         pipelineTriggers([upstream(
                     threshold: 'SUCCESS',
@@ -30,6 +31,7 @@ properties([
         )
     ]
 )
+ */
 
 podTemplate(
     name: pod_name,
