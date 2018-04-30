@@ -21,7 +21,7 @@ import os
 import pyspark
 
 import eskapade
-from eskapade import resources
+from eskapadespark import resources
 from eskapade.core.mixin import ConfigMixin
 from eskapade.core.process_services import ProcessService
 from eskapadespark.functions import SPARK_UDFS

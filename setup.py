@@ -96,7 +96,7 @@ def setup_package() -> None:
           license='',
           author='KPMG N.V. The Netherlands',
           author_email='kave@kpmg.com',
-          description='Eskapade modular analytics',
+          description='Spark for Eskapade',
           python_requires='>=3.5',
           package_dir={'': 'python'},
           packages=find_packages(where='python', exclude=EXCLUDE_PACKAGES),
@@ -104,7 +104,7 @@ def setup_package() -> None:
           # This is a feature and not a bug, see
           # http://setuptools.readthedocs.io/en/latest/setuptools.html#non-package-data-files
           package_data={
-              NAME.lower(): ['config/*', 'templates/*', 'data/*', 'tutorials/*.sh']
+              'eskapadespark': ['config/spark/*.cfg', 'templates/*', 'data/*', 'tutorials/*.sh']
           },
           install_requires=REQUIREMENTS,
           tests_require=TEST_REQUIREMENTS,

@@ -178,7 +178,7 @@ class SparkManagerTest(unittest.TestCase):
             SparkManager.get_session(mock_sm)
         mock_sm.reset_mock()
 
-    @mock.patch('eskapade.resources.config')
+    @mock.patch('eskapadespark.resources.config')
     @mock.patch('pyspark.conf')
     def test_create_spark_conf(self, mock_conf_mod, mock_resources):
         """Test creation of Spark configuration"""
