@@ -23,19 +23,19 @@ NAME = 'Eskapade-Spark'
 MAJOR = 0
 REVISION = 8
 PATCH = 0
-DEV = True
+DEV = False
 
 VERSION = '{major}.{revision}.{patch}'.format(major=MAJOR, revision=REVISION, patch=PATCH)
 FULL_VERSION = VERSION
 if DEV:
     FULL_VERSION += '.dev'
 
-TEST_REQUIREMENTS = ['pytest==3.5.0',
-                     'pytest-pylint==0.9.0',
+TEST_REQUIREMENTS = ['pytest>=3.5.0',
+                     'pytest-pylint>=0.9.0',
                      ]
 
 REQUIREMENTS = [
-    'eskapade==0.8.0.dev',
+    'eskapade>=0.8.0',
     'pyspark==2.1.2',
 ]
 

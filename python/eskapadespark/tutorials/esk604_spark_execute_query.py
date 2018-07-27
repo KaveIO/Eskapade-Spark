@@ -16,9 +16,9 @@ modification, are permitted according to the terms listed in the file
 LICENSE.
 """
 
-from eskapade import process_manager, ConfigObject, resources, Chain
+from eskapade import process_manager, ConfigObject, Chain
 from eskapade.logger import Logger
-from eskapadespark import SparkManager, SparkDfReader, SparkExecuteQuery
+from eskapadespark import SparkManager, SparkDfReader, SparkExecuteQuery, resources
 
 logger = Logger()
 

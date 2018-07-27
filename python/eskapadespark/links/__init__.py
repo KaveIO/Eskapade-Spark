@@ -13,6 +13,9 @@ from eskapadespark.links.spark_streaming_writer import SparkStreamingWriter
 from eskapadespark.links.spark_with_column import SparkWithColumn
 from eskapadespark.links.sparkgeneralfuncprocessor import SparkGeneralFuncProcessor
 from eskapadespark.links.sparkhister import SparkHister
+from eskapadespark.links.daily_summary import DailySummary
+from eskapadespark.links.find_days_until_event import FindDaysUntilEvent
+
 
 __all__ = ['RddGroupMapper',
            'SparkConfigurator',
@@ -28,4 +31,6 @@ __all__ = ['RddGroupMapper',
            'SparkStreamingWriter',
            'SparkWithColumn',
            'SparkGeneralFuncProcessor',
-           'SparkHister']
+           'SparkHister',
+           'DailySummary',
+           'FindDaysUntilEvent']

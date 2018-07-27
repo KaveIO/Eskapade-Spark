@@ -2,12 +2,11 @@
 
 Class: SparkWithColumn
 
-Created: 2017/06/20
+Created: 2018-03-08
 
 Description:
-    SparkWithColumn applies a (user-defined) function to column(s) in
-    a Spark dataframe and adds its output as a new column to the
-    same dataframe.
+    SparkWithColumn adds the output of a column expression (column operation,
+    sql.functions function, or udf) to a dataframe.
 
 Authors:
     KPMG Advanced Analytics & Big Data team, Amstelveen, The Netherlands
@@ -17,79 +16,82 @@ modification, are permitted according to the terms listed in the file
 LICENSE.
 """
 
+from pyspark.sql.column import Column
 
 from eskapade import process_manager, DataStore, Link, StatusCode
 
 
 class SparkWithColumn(Link):
-    """Create a new column from columns in a Spark dataframe.
+    """Create a new column from columns in a Spark dataframe
 
-    SparkWithColumn applies a (user-defined) function to column(s) in a
-    Spark dataframe and adds its output as a new column to the same
-    dataframe.
+    SparkWithColumn adds the output of a column expression (column operation,
+    sql.functions function, or udf) to a dataframe.
     """
 
     def __init__(self, **kwargs):
-        """Initialize link instance.
+        """Initialize SparkWithColumn instance
 
         :param str name: name of link
         :param str read_key: key of data to read from data store
         :param str store_key: key of data to store in data store
-        :param str new_column: name of newly created column
-        :param col func: a Column expression - function to create the new column with
-        :param list col_select: list of column names or columns in a dataframe; specifies to which columns
-                                the function is applied, together with col_usage (use all columns if not specified)
-        :param list col_usage: use columns in col_select ('include') or any other columns in dataframe ('exclude')
+        :param str new_col_name: name of newly created column
+        :param Column new_col: the column object to be included in the dataframe, resulting from a column expression
         """
-        # initialize Link
+
+        # initialize Link, pass name from kwargs
         Link.__init__(self, kwargs.pop('name', 'SparkWithColumn'))
 
-        # process keyword arguments
-        self._process_kwargs(kwargs, read_key='', store_key='', new_column='', func=None, col_select=None,
-                             col_usage='include')
-        self.check_extra_kwargs(kwargs)
+        # Process and register keyword arguments. If the arguments are not given, all arguments are popped from
+        # kwargs and added as attributes of the link. Otherwise, only the provided arguments are processed.
+        self._process_kwargs(kwargs, read_key='', store_key='', new_col_name='', new_col=None)
 
-        # initialize other attributes
-        self.schema = None
+        # check residual kwargs; exit if any present
+        self.check_extra_kwargs(kwargs)
+        # Turn off the line above, and on the line below if you wish to keep these extra kwargs.
+        # self._process_kwargs(kwargs)
 
     def initialize(self):
-        """Initialize the link."""
+        """Initialize the link.
+
+        :returns: status code of initialization
+        :rtype: StatusCode
+        """
+
         # check input arguments
-        self.check_arg_types(read_key=str, store_key=str, col_usage=str, new_column=str)
-        self.check_arg_vals('read_key', 'new_column')
-        self.check_arg_opts(col_usage=('include', 'exclude'))
-        self.check_arg_iters('col_select', allow_none=True)
-        self.check_arg_callable('func')
+        self.check_arg_types(read_key=str, store_key=str, new_col=Column)
+        self.check_arg_vals('read_key', 'new_col_name')
         if not self.store_key:
             self.store_key = self.read_key
-        if self.col_select is not None:
-            self.col_select = tuple(self.col_select)
 
         return StatusCode.Success
 
     def execute(self):
-        """Execute the link."""
-        # fetch data frame
+        """Execute the link.
+
+        :returns: status code of execution
+        :rtype: StatusCode
+        """
         ds = process_manager.service(DataStore)
+
+        # --- your algorithm code goes here
+        self.logger.debug('Now executing link: {link}.', link=self.name)
+
         spark_df = ds[self.read_key]
 
-        # use all columns if columns-select argument was not provided
-        if self.col_select is None:
-            self.col_select = tuple(spark_df.columns)
-
-        # set list of columns to apply the function to
-        # As the columns in 'col_select' can be either column names (strings) or the actual columns, some additional
-        # processing is required in the below.
-        cols = [spark_df[c] if isinstance(c, str) else c for c in self.col_select]
-        if self.col_usage == 'exclude':
-            # apply function to all columns in the dataframe which are not in 'col_select'
-            col_names = [str(c) for c in cols]
-            cols = [spark_df[c] for c in spark_df.columns if c not in col_names]
-
         # apply function
-        new_spark_df = spark_df.withColumn(self.new_column, self.func(*cols))
+        new_spark_df = spark_df.withColumn(self.new_col_name, self.new_col)
 
         # store updated data frame
         ds[self.store_key] = new_spark_df
+
+        return StatusCode.Success
+
+    def finalize(self):
+        """Finalize the link.
+
+        :returns: status code of finalization
+        :rtype: StatusCode
+        """
+        # --- any code to finalize the link follows here
 
         return StatusCode.Success

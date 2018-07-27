@@ -20,9 +20,9 @@ LICENSE.
 
 from pyspark.sql import types, functions
 
-from eskapade import process_manager, ConfigObject, resources, Chain
+from eskapade import process_manager, ConfigObject, Chain
 from eskapade.logger import Logger
-from eskapadespark import SparkManager, SparkDfReader, SparkWithColumn
+from eskapadespark import SparkManager, SparkDfReader, SparkWithColumn, resources
 
 logger = Logger()
 
@@ -66,26 +66,12 @@ read.add(read_link)
 # create link to create new column
 col_link = SparkWithColumn(name='UdfPower', read_key=read_link.store_key, store_key='new_spark_df')
 
-# example using a user-defined function and the 'include'-option
-col_link.col_select = ['x', 'y']
-col_link.col_usage = 'include'
-col_link.func = functions.udf(lambda a, b: float(a) ** float(b), returnType=types.DoubleType())  # Power of two columns
-col_link.new_column = 'pow_xy1'
+# Power of two columns
+col_link.new_col = functions.pow(functions.col('x'), functions.col('y'))
+col_link.new_col_name = 'pow_xy1'
 
 # add link to chain
 add_col = Chain('AddColumn')
-add_col.add(col_link)
-
-# create link to create new column
-col_link = SparkWithColumn(name='BuiltPower', read_key=col_link.store_key, store_key=col_link.store_key)
-
-# example using a built-in Spark-function and the 'exclude'-option
-col_link.col_select = ['dummy', 'date', 'loc', 'pow_xy1']
-col_link.col_usage = 'exclude'
-col_link.func = functions.pow  # Power of two columns
-col_link.new_column = 'pow_xy2'
-
-# add link to chain
 add_col.add(col_link)
 
 ##########################################################################

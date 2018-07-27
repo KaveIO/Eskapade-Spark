@@ -216,14 +216,14 @@ class SparkAnalysisTutorialMacrosTest(TutorialMacrosTest):
         self.assertIn('new_spark_df', ds, 'no object with key "new_spark_df" in data store')
         self.assertIsInstance(ds['new_spark_df'], pyspark.sql.DataFrame, '"new_spark_df" is not a Spark data frame')
         self.assertEqual(ds['new_spark_df'].count(), 5, 'unexpected number of rows in filtered data frame')
-        self.assertListEqual(ds['new_spark_df'].columns, ['dummy', 'date', 'loc', 'x', 'y', 'pow_xy1', 'pow_xy2'],
+        self.assertListEqual(ds['new_spark_df'].columns, ['dummy', 'date', 'loc', 'x', 'y', 'pow_xy1'],
                              'unexpected columns in data frame')
         self.assertSetEqual(set(tuple(r) for r in ds['new_spark_df'].collect()),
-                            set([('bla', 20090103, 'c', 5, 7, 78125.0, 78125.0),
-                                 ('bal', 20090102, 'b', 3, 8, 6561.0, 6561.0),
-                                 ('flo', 20090104, 'e', 3, 5, 243.0, 243.0),
-                                 ('bar', 20090101, 'a', 1, 9, 1.0, 1.0),
-                                 ('foo', 20090104, 'd', 1, 6, 1.0, 1.0)]),
+                            set([('bla', 20090103, 'c', 5, 7, 78125.0),
+                                 ('bal', 20090102, 'b', 3, 8, 6561.0),
+                                 ('flo', 20090104, 'e', 3, 5, 243.0),
+                                 ('bar', 20090101, 'a', 1, 9, 1.0),
+                                 ('foo', 20090104, 'd', 1, 6, 1.0)]),
                             'unexpected values in columns')
 
     def test_esk608(self):
@@ -348,3 +348,10 @@ class SparkAnalysisTutorialMacrosTest(TutorialMacrosTest):
                         self.assertRegex(record[1], 'world', 'Expected \'world\' as in \'Hello world\'')
                     contents.append(record[:])
         self.assertGreater(len(contents), 0, 'expected ~ten items (each second a streaming RDD) - depending on timing')
+
+    def test_esk611(self):
+        self.eskapade_run(resources.tutorial('esk611_flatten_time_series.py'))
+        output_dir = os.path.join(persistence.io_dir('results_data'), 'dummy_time_series_flat.csv')
+        self.assertTrue(os.path.exists(output_dir))
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir)

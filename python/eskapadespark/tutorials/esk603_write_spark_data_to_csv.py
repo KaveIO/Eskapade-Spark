@@ -21,13 +21,13 @@ from eskapadespark import SparkManager, SparkDfWriter, SparkDataToCsv
 
 logger = Logger()
 
-logger.debug('Now parsing configuration file esk603_read_csv_to_spark_df')
+logger.debug('Now parsing configuration file esk603_write_spark_data_to_csv')
 
 ##########################################################################
 # --- minimal analysis information
 
 settings = process_manager.service(ConfigObject)
-settings['analysisName'] = 'esk603_read_csv_to_spark_df'
+settings['analysisName'] = 'esk603_write_spark_data_to_csv'
 settings['version'] = 0
 
 ##########################################################################
@@ -81,4 +81,4 @@ for lnk in writers.values():
 
 ##########################################################################
 
-logger.debug('Done parsing configuration file esk603_read_csv_to_spark_df')
+logger.debug('Done parsing configuration file esk603_write_spark_data_to_csv')
