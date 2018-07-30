@@ -13,6 +13,7 @@ except ImportError:
 
     raise MissingPy4jError()
 
+from eskapadespark import decorators
 from .spark_manager import SparkManager
 from .links import *
 
