@@ -19,10 +19,10 @@ Version 0.8
 -----------
 
 Version 0.8 of Eskapade-Spark (August 2018) is a split off of the ``spark-analysis`` module of Eskapade v0.7
-into a separate package. 
+into a separate package. This way, Eskapade v0.8 no longer depends on Spark. This new package Eskapade-Spark does require Spark to install, clearly.
 
-This way, Eskapade v0.8 no longer depends on Spark. This new package Eskapade-Spark does require Spark to install, clearly.
-
+In addition, we have included new analysis code for processing ("flattening") time-series data, so it can be easily used as input for machine learning models.
+See tutorial example esk611 for details.
 
 
 Installation
