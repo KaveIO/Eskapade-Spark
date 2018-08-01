@@ -70,7 +70,25 @@ After installation, you can now do in Python:
 
 **Congratulations, you are now ready to use Eskapade-Spark!**
 
-For all available examples, please see the `tutorials <http://eskapade-spark.readthedocs.io>`_.
+
+Quick run
+=========
+
+To see the available Eskapade-Spark examples, do:
+
+.. code-block:: bash
+
+  $ export TUTDIR=`pip show Eskapade-Spark | grep Location | awk '{ print $2"/eskapadespark/tutorials" }'`
+  $ ls -l $TUTDIR/
+
+E.g. you can now run:
+
+.. code-block:: bash
+
+  $ eskapade_run $TUTDIR/esk601_spark_configuration.py
+
+
+For all available examples, please see the `tutorials <http://eskapade-spark.readthedocs.io/en/latest/tutorials.html>`_.
 
 
 Contact and support
