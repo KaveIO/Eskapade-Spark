@@ -111,9 +111,6 @@ def setup_package() -> None:
           ext_modules=EXTERNAL_MODULES,
           cmdclass=CMD_CLASS,
           command_options=COMMAND_OPTIONS,
-          # dependency_links=[
-          #    'git+https://git.kpmg.nl/KPMG-NL-AABD/Assets/decision-engine/eskapade.git@split_esroofit#egg=eskapade-0.8.0.dev',
-          # ]
           )
 
 
