@@ -16,7 +16,7 @@ then
 
 .. code-block:: bash
 
-  pip install -e eskapade-root
+  pip install -e eskapade-spark
 
 this will install Eskapade in editable mode, which will allow you to edit the code and run it as
 you would with a normal installation of eskapade.
@@ -25,7 +25,7 @@ To make sure that everything works try executing eskapade without any arguments,
 
 .. code-block:: bash
 
-  eskapade_run
+  eskapade_run --help
 
 or you could just execute the tests using either the eskapade test runner, e.g.
 
