@@ -22,7 +22,8 @@ autodoc_mock_imports = ['pyspark',
                         'pyspark.sql',
                         'pyspark.sql.types',
                         'pyspark.sql.functions',
-                        'pyspark.sql.column']
+                        'pyspark.sql.column',
+                        'eskapadespark.resources']
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
