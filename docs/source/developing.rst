@@ -10,7 +10,7 @@ First clone Eskapade-Spark.
 
 .. code-block:: bash
 
-  git clone git@github.com:KaveIO/Eskapade-Spark.git eskapade-spark
+  git clone https://github.com/KaveIO/Eskapade-Spark.git eskapade-spark
 
 then
 
