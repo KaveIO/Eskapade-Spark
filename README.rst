@@ -2,7 +2,7 @@
 Eskapade-Spark
 ==============
 
-* Version: 0.8.1
+* Version: 0.8.2
 * Released: Nov 2018
 
 Eskapade is a light-weight, python-based data analysis framework, meant for modularizing all sorts of data analysis problems
