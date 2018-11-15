@@ -22,8 +22,10 @@ NAME = 'Eskapade-Spark'
 
 MAJOR = 0
 REVISION = 8
-PATCH = 0
+PATCH = 1
 DEV = False
+
+# Note: also update version at: docs/source/conf.py 
 
 VERSION = '{major}.{revision}.{patch}'.format(major=MAJOR, revision=REVISION, patch=PATCH)
 FULL_VERSION = VERSION
@@ -35,7 +37,7 @@ TEST_REQUIREMENTS = ['pytest>=3.5.0',
                      ]
 
 REQUIREMENTS = [
-    'eskapade>=0.8.0',
+    'eskapade>=0.8.1',
     'pyspark==2.1.2',
 ]
 
