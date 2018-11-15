@@ -37,7 +37,7 @@ TEST_REQUIREMENTS = ['pytest>=3.5.0',
                      ]
 
 REQUIREMENTS = [
-    'eskapade>=0.8.1',
+    'eskapade>=0.8.2',
     'pyspark==2.1.2',
 ]
 
