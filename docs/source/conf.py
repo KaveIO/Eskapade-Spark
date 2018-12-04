@@ -10,7 +10,7 @@ import os, sys
 #version = esversion.full_version
 
 # hard-code version number; readthedocs cannot import eskapadespark
-version = '0.8.2'
+version = '0.8.3'
 
 # Classes that use non-python modules are not always available in the
 # RTD environment. By mocking them we can still import these classes
