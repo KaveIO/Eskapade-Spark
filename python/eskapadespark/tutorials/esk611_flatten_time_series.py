@@ -18,7 +18,7 @@ LICENSE.
 import os
 from pyspark.sql import functions as f, Window
 
-from eskapade import ConfigObject, process_manager, spark_analysis, Chain
+from eskapade import ConfigObject, process_manager, Chain
 from eskapade.core import persistence
 from eskapade.core_ops import DsToDs
 from eskapadespark import SparkDfWriter, SparkDfReader, SparkManager, FindDaysUntilEvent, DailySummary, \
