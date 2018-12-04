@@ -22,7 +22,7 @@ NAME = 'Eskapade-Spark'
 
 MAJOR = 0
 REVISION = 8
-PATCH = 3
+PATCH = 4
 DEV = False
 
 # Note: also update version at: README.rst and docs/source/conf.py 
