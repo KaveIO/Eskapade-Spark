@@ -4,7 +4,7 @@ import numpy as np
 
 from eskapade import process_manager, DataStore, ConfigObject
 from eskapadespark import SparkManager, FindDaysUntilEvent
-from eskapade.core import execution
+from escore.core import execution
 
 
 class FindDaysUntilEventTest(unittest.TestCase):

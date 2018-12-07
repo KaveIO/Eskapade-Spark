@@ -4,7 +4,7 @@ import pyspark.sql.functions as f
 
 from eskapade import process_manager, DataStore, ConfigObject
 from eskapadespark import SparkManager, SparkWithColumn
-from eskapade.core import execution
+from escore.core import execution
 
 
 class SparkWithColumnTest(unittest.TestCase):

@@ -19,7 +19,7 @@ import uuid
 
 import pyspark
 
-from eskapade.helpers import apply_transform_funcs
+from eskapadespark.helpers import apply_transform_funcs
 from eskapade.logger import Logger
 
 SPARK_SQL_TYPES = pyspark.sql.types._type_mappings

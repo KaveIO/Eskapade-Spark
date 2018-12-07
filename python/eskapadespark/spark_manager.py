@@ -22,8 +22,8 @@ import pyspark
 
 import eskapade
 from eskapadespark import resources
-from eskapade.core.mixin import ConfigMixin
-from eskapade.core.process_services import ProcessService
+from escore.core.mixin import ConfigMixin
+from escore.core.process_services import ProcessService
 from eskapadespark.functions import SPARK_UDFS
 
 logging.getLogger('py4j.java_gateway').setLevel('INFO')

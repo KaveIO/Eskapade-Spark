@@ -15,7 +15,7 @@ LICENSE.
 from collections import OrderedDict as odict
 
 from eskapade import process_manager, ConfigObject, DataStore, Chain
-from eskapade.core import persistence
+from escore.core import persistence
 from eskapade.logger import Logger
 from eskapadespark import SparkManager, SparkDfWriter, SparkDataToCsv
 

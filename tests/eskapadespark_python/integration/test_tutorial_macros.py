@@ -11,7 +11,7 @@ import pyspark
 from pyspark.sql.types import StructField, LongType, DoubleType, StringType
 
 from eskapade import process_manager, ConfigObject, DataStore
-from eskapade.core import persistence
+from escore.core import persistence
 from eskapade.logger import Logger
 from eskapadespark import resources
 from eskapadespark import SparkManager

@@ -13,10 +13,8 @@ except ImportError:
 
     raise MissingPy4jError()
 
+from eskapadespark import helpers
 from eskapadespark import decorators
 from .spark_manager import SparkManager
 from .links import *
 
-import eskapade.utils
-
-eskapade.utils.set_matplotlib_backend(silent=False)

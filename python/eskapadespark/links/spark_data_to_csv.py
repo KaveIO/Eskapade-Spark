@@ -21,7 +21,7 @@ import shutil
 import pyspark
 
 from eskapade import Link, StatusCode, process_manager, DataStore
-from eskapade.core import persistence
+from escore.core import persistence
 
 
 class SparkDataToCsv(Link):

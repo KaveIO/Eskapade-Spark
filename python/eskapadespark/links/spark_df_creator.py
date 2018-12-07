@@ -16,7 +16,7 @@ LICENSE.
 """
 
 from eskapade import Link, StatusCode, process_manager, DataStore
-from eskapade.helpers import process_transform_funcs
+from eskapadespark.helpers import process_transform_funcs
 
 from eskapadespark import SparkManager, data_conversion
 
