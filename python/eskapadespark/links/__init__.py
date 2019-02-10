@@ -18,7 +18,6 @@ from eskapadespark.links.find_days_until_event import FindDaysUntilEvent
 from eskapadespark.links.hive_reader import HiveReader
 from eskapadespark.links.hive_writer import HiveWriter
 
-
 __all__ = ['RddGroupMapper',
            'SparkConfigurator',
            'SparkDataToCsv',
