@@ -37,8 +37,10 @@ TEST_REQUIREMENTS = ['pytest>=3.5.0',
                      ]
 
 REQUIREMENTS = [
-    'eskapade>=0.8.2',
+    'Eskapade-Core>=1.0.0',
+    'Eskapade>=0.9.4',
     'pyspark>=2.1.2',
+    'jaydebeapi>=1.1.1',
 ]
 
 REQUIREMENTS += TEST_REQUIREMENTS
