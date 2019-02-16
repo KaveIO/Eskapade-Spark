@@ -15,6 +15,8 @@ from eskapadespark.links.sparkgeneralfuncprocessor import SparkGeneralFuncProces
 from eskapadespark.links.sparkhister import SparkHister
 from eskapadespark.links.daily_summary import DailySummary
 from eskapadespark.links.find_days_until_event import FindDaysUntilEvent
+from eskapadespark.links.hive_reader import HiveReader
+from eskapadespark.links.hive_writer import HiveWriter
 
 
 __all__ = ['RddGroupMapper',
@@ -33,4 +35,6 @@ __all__ = ['RddGroupMapper',
            'SparkGeneralFuncProcessor',
            'SparkHister',
            'DailySummary',
-           'FindDaysUntilEvent']
+           'FindDaysUntilEvent',
+           'HiveReader',
+           'HiveWriter']
