@@ -20,8 +20,8 @@ from setuptools import setup
 
 NAME = 'Eskapade-Spark'
 
-MAJOR = 0
-REVISION = 9
+MAJOR = 1
+REVISION = 0
 PATCH = 0
 DEV = False
 
@@ -38,7 +38,7 @@ TEST_REQUIREMENTS = ['pytest>=3.5.0',
 
 REQUIREMENTS = [
     'Eskapade-Core>=1.0.0',
-    'Eskapade>=0.9.4',
+    'Eskapade>=1.0.0',
     'pyspark>=2.1.2',
     'jaydebeapi>=1.1.1',
 ]

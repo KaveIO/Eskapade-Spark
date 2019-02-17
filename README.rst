@@ -2,8 +2,8 @@
 Eskapade-Spark
 ==============
 
-* Version: 0.9.0
-* Released: Dec 2018
+* Version: 1.0.0
+* Released: Feb 2019
 
 Eskapade is a light-weight, python-based data analysis framework, meant for modularizing all sorts of data analysis problems
 into reusable analysis components. For documentation on Eskapade, please go to this `link <http://eskapade.readthedocs.io>`_.
@@ -14,6 +14,16 @@ For documentation on Eskapade-Spark, please go `here <http://eskapade-spark.read
 
 Release notes
 =============
+
+Version 1.0
+-------------
+
+Eskapade-Spark v1.0 (February 2019) is in synch with Eskapade-Core v1.0 and Eskapade v1.0,
+contains several small upgrades wrt v0.9:
+
+* Minor upgrades to spark_histogrammar_filler link.
+* Include hive_reader and hive_writer links, for working with hive tables.
+* Include jdbc module, for opening a connection to a jdbc database, and a jdbc_reader link.
 
 Version 0.9
 -----------
