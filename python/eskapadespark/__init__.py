@@ -2,14 +2,14 @@
 try:
     import pyspark
 except ImportError:
-    from eskapade import MissingSparkError
+    from eskapadespark.exceptions import MissingSparkError
 
     raise MissingSparkError()
 
 try:
     import py4j
 except ImportError:
-    from eskapade import MissingPy4jError
+    from eskapadespark.exceptions import MissingPy4jError
 
     raise MissingPy4jError()
 

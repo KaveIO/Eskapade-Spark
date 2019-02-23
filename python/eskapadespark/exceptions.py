@@ -39,3 +39,16 @@ class MissingPy4jError(MissingPackageError):
         """
         mess = message if message else 'unable to import Py4J framework'
         MissingPackageError.__init__(self, message=mess, required_by=required_by)
+
+
+class MissingJayDeBeApiError(MissingPackageError):
+    """Exception raised if JayDeBeAPI is missing."""
+
+    def __init__(self, message='', required_by=''):
+        """Set missing-package arguments.
+
+        :param str message: message to show when raised
+        :param str required_by: info on component that requires the package
+        """
+        mess = message if message else 'unable to import JayDeBeAPI package'
+        MissingPackageError.__init__(self, message=mess, required_by=required_by)

@@ -19,24 +19,16 @@ modification, are permitted according to the terms listed in the file
 LICENSE.
 """
 
-import histogrammar
+import histogrammar as hg
 import histogrammar.sparksql
 import numpy as np
 import pandas as pd
 import pyspark
-from pyspark.sql.functions import udf
-from pyspark.sql.types import FloatType
+from pyspark.sql.functions import col as sparkcol
 
-from eskapade.analysis import HistogrammarFiller, histogram_filling as hf
-
-
-def unit_func(x):
-    """Doesn't do anything. Used as a default new quantity function.
-
-    :param x: value
-    :return: the same value
-    """
-    return x
+from eskapade.analysis.histogram_filling import HistogramFillerBase
+from eskapade.analysis import HistogrammarFiller
+from eskapade.analysis.links.hist_filler import hgr_convert_bool_to_str, hgr_fix_contentType, get_n_bins
 
 
 class SparkHistogrammarFiller(HistogrammarFiller):
@@ -90,8 +82,8 @@ class SparkHistogrammarFiller(HistogrammarFiller):
             kwargs['name'] = 'SparkHistogrammarFiller'
         HistogrammarFiller.__init__(self, **kwargs)
 
-        self._unit_timestamp_specs = {'bin_width': float(pd.Timedelta(days=30).value),
-                                      'bin_offset': float(pd.Timestamp('2010-01-04').value)}
+        self._unit_timestamp_specs = {'bin_width': float(pd.Timedelta(days=7).value),
+                                      'bin_offset': float(pd.Timestamp('2017-01-02').value)}
 
     def fill_histogram(self, idf, columns):
         """Fill input histogram with column(s) of input dataframe.
@@ -124,43 +116,33 @@ class SparkHistogrammarFiller(HistogrammarFiller):
         :returns: created histogram
         :rtype: histogrammar.Count
         """
-        hist = histogrammar.Count()
+        hist = hg.Count()
 
         # create a multi-dim histogram by iterating through the columns in reverse order
         # and passing a single-dim hist as input to the next column
-        for col in reversed(columns):
+        revcols = list(reversed(columns))
+        for idx,col in enumerate(revcols):
             # histogram type depends on the data type
             dt = np.dtype(self.var_dtype[col])
-
             is_number = isinstance(dt.type(), np.number)
             is_timestamp = isinstance(dt.type(), np.datetime64)
 
             if is_number or is_timestamp:
                 # numbers and timestamps are put in a sparse binned histogram
-                specs = self.bin_specs.get(col, self._unit_bin_specs if is_number else self._unit_timestamp_specs)
-                hist = histogrammar.SparselyBin(binWidth=specs['bin_width'], origin=specs['bin_offset'],
-                                                quantity=df[col],
-                                                value=hist)
+                specs = self.var_bin_specs(columns, columns.index(col))
+                hist = hg.SparselyBin(binWidth=specs['bin_width'], origin=specs['bin_offset'], quantity=df[col], value=hist)
             else:
                 # string and boolians are treated as categories
-                hist = histogrammar.Categorize(quantity=df[col], value=hist)
+                hist = hg.Categorize(quantity=df[col], value=hist)
+
+            # decorators; adding them here doesn't seem to work!
+            #selected_cols = revcols[:idx+1]
+            #hist.datatype = [self.var_dtype[col] for col in reversed(selected_cols)]
 
         # FIXME stick data types and number of dimension to histogram
         dta = [self.var_dtype[col] for col in columns]
         hist.datatype = dta[0] if len(columns) == 1 else dta
         hist.n_dim = len(columns)
-
-        @property
-        def n_bins(self):
-            """Get number of bins."""
-            if hasattr(self, 'num'):
-                return self.num
-            elif hasattr(self, 'size'):
-                return self.size
-            else:
-                raise RuntimeError('Cannot retrieve number of bins from hgr hist.')
-
-        hist.n_bins = n_bins
 
         return hist
 
@@ -198,36 +180,32 @@ class SparkHistogrammarFiller(HistogrammarFiller):
             dt = 'str'
         elif dt == 'timestamp':
             dt = np.datetime64
+        elif dt == 'boolean':
+            dt = bool
         return np.dtype(dt)
 
     def process_columns(self, df):
         """Process columns before histogram filling.
 
-        Specifically, convert timestamp columns to integers
+        Specifically, in this case convert timestamp columns to nanoseconds
 
         :param df: input data frame
         :returns: output data frame with converted timestamp columns
         :rtype: DataFrame
         """
-        # histogrammar does not yet support long integers
-        def to_ns(x):
-            """Convert to ns."""
-            return float(hf.to_ns(x))
-
-        udf_to_ns = udf(to_ns, FloatType())
-
-        # udf_to_ns = udf(hf.to_ns, LongType())
-
         # make alias df for value counting (used below)
         idf = df.alias('')
 
-        # timestamp variables are converted to ns here
+        # timestamp variables are converted here to ns since 1970-1-1
+        # histogrammar does not yet support long integers, so convert timestamps to float
+        #epoch = (sparkcol("ts").cast("bigint") * 1000000000).cast("bigint")
         for col in self.dt_cols:
             self.logger.debug('Converting column "{col}" of type "{type}" to nanosec.',
                               col=col, type=self.var_dtype[col])
-            idf = idf.withColumn(col, udf_to_ns(*[col]))
+            to_ns = (sparkcol(col).cast("float") * 1e9).cast("float")
+            idf = idf.withColumn(col, to_ns)
 
-        histogrammar.sparksql.addMethods(idf)
+        hg.sparksql.addMethods(idf)
 
         return idf
 
@@ -236,40 +214,65 @@ class SparkHistogrammarFiller(HistogrammarFiller):
         # if quantity refers to a spark df, the histogram cannot be pickled,
         # b/c we cannot pickle a spark df.
         # HACK: patch the quantity pickle bug here before storage into the datastore
+        # Also patch: contentType and keys of sub-histograms
         for name, hist in self._hists.items():
-            self.logger.debug('Processing histogram {name}.', name=name)
-            self.reset_hgr_quantity(hist)
-            continue
+            hgr_patch_histogram(hist)
+            hist.n_bins = get_n_bins(hist)
 
         # put hists in datastore as normal
-        HistogrammarFiller.process_and_store(self)
+        HistogramFillerBase.process_and_store(self)
 
-    def reset_hgr_quantity(self, hist, new_quantity=unit_func):
-        """Reset quantity attribute of histogrammar histogram.
 
-        If quantity refers to a Spark df the histogram cannot be pickled,
-        b/c we cannot pickle a Spark df.
-        Here we reset the quantity of a (filled) histogram to a neutral lambda function.
+def hgr_patch_histogram(hist):
+    """Apply set of patches to histogrammer histogram.
 
-        :param hist: histogrammar histogram to reset quantity of.
-        :param new_quantity: new quantity function to reset hist.quantity to. default is lambda x: x.
-        """
-        # nothing left to reset?
-        if isinstance(hist, histogrammar.Count):
-            return
-        # reset quantity
-        if hasattr(hist, 'quantity'):
-            # self.logger.debug('Reset quantity of obj-type {type}', type=type(hist))
-            hist.quantity = new_quantity
-        # process histogram's bins for their quantity attributes
-        if not hasattr(hist, 'bins'):
-            return
-        if not isinstance(hist.bins, dict):
-            return
-        # 1. loop through bins
-        for i_bin in hist.bins.values():
-            self.reset_hgr_quantity(i_bin, new_quantity)
-        # 2. process value attribute if present
-        if not hasattr(hist, 'value'):
-            return
-        self.reset_hgr_quantity(hist.value, new_quantity)
+    :param hist: histogrammar histogram to patch up.
+    """
+    hgr_reset_quantity(hist, new_quantity=unit_func)
+    hgr_fix_contentType(hist)
+    hgr_convert_bool_to_str(hist)
+
+def unit_func(x):
+    """Dummy quantity function for histogrammar objects
+
+    :param x: value
+    :returns: the same value
+    """
+    return x
+
+# name needed for hist.toJson()
+unit_func.name = 'unit_func'
+
+def hgr_reset_quantity(hist, new_quantity=unit_func):
+    """Reset quantity attribute of histogrammar histogram.
+
+    If quantity refers to a Spark df the histogram cannot be pickled,
+    b/c we cannot pickle a Spark df.
+    Here we reset the quantity of a (filled) histogram to a neutral lambda function.
+
+    :param hist: histogrammar histogram to reset quantity of.
+    :param new_quantity: new quantity function to reset hist.quantity to. default is lambda x: x.
+    """
+    # nothing left to reset?
+    if isinstance(hist, hg.Count):
+        return
+    # reset quantity
+    if hasattr(hist, 'quantity'):
+        hist.quantity = new_quantity
+    # 1. loop through bins
+    if hasattr(hist, 'bins'):
+        for h in hist.bins.values():
+            hgr_reset_quantity(h, new_quantity)
+    # 2. loop through values
+    elif hasattr(hist, 'values'):
+        for h in hist.values:
+            hgr_reset_quantity(h, new_quantity)
+    # 3. process attributes if present
+    if hasattr(hist, 'value'):
+        hgr_reset_quantity(hist.value, new_quantity)
+    if hasattr(hist, 'underflow'):
+        hgr_reset_quantity(hist.underflow, new_quantity)
+    if hasattr(hist, 'overflow'):
+        hgr_reset_quantity(hist.overflow, new_quantity)
+    if hasattr(hist, 'nanflow'):
+        hgr_reset_quantity(hist.nanflow, new_quantity)
